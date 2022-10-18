@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tasks_with_firebase/Screen/auth/login.dart';
 import 'package:tasks_with_firebase/share/components/components.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -43,6 +44,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _focusPostionCompany.dispose();
   }
 
+  void submitFormOnSign() {
+    final isValid = _formKeySign.currentState!.validate();
+    FocusScope.of(context).unfocus();
+    if (isValid) {
+      print("Form valid");
+    } else {
+      print("Form not valid");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,7 +79,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     'Already have an account?',
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LoginScreen(),
+                        ),
+                      );
+                    },
                     child: Text(
                       'Login',
                     ),
@@ -131,11 +149,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 },
                 type: TextInputType.visiblePassword,
                 validate: (String value) {
-                  if (value.isEmpty || value.length < 7) {
+                  if (value.isEmpty) {
+                    return 'password must be not empty';
+                  } else if (value.length < 7) {
                     return 'password is too short';
+                  } else {
+                    return null;
                   }
-
-                  return null;
                 },
               ),
               SizedBox(
@@ -148,7 +168,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   type: TextInputType.text,
                   validate: (String value) {
                     if (value.isEmpty) {
-                      return 'Postion must not be empty';
+                      return 'Postion must be not empty';
                     }
 
                     return null;
@@ -164,10 +184,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     borderRadius: BorderRadius.circular(5.0)),
                 width: double.infinity,
                 child: MaterialButton(
-                  onPressed: () {
-                    print(_textEmailAdress.text);
-                    print(_textPassword.text);
-                  },
+                  onPressed: submitFormOnSign,
                   child: Text(
                     'Register',
                     style: TextStyle(color: Colors.white, fontSize: 20.0),

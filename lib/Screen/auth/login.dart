@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tasks_with_firebase/Screen/auth/forget_password.dart';
 import 'package:tasks_with_firebase/Screen/auth/sign.dart';
 import 'package:tasks_with_firebase/share/components/components.dart';
 
@@ -96,11 +97,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                           type: TextInputType.visiblePassword,
                           validate: (String value) {
-                            if (value.isEmpty || value.length < 7) {
+                            if (value.isEmpty) {
+                              return 'password must be not empty';
+                            } else if (value.length < 7) {
                               return 'password is too short';
+                            } else {
+                              return null;
                             }
-
-                            return null;
                           },
                         ),
                       ]),
@@ -112,7 +115,14 @@ class _LoginScreenState extends State<LoginScreen> {
               Align(
                   alignment: Alignment.topRight,
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ForgetPaswordScreen(),
+                        ),
+                      );
+                    },
                     child: Text("forget the password?"),
                   )),
               SizedBox(

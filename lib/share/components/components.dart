@@ -64,7 +64,7 @@ Widget defaultFormField({
         onChange!(s);
       },
       validator: (s) {
-        validate(s);
+        return validate(s);
       },
       onTap: () {
         onTap!();
