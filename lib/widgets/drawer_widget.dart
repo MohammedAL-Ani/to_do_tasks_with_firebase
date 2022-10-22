@@ -48,7 +48,7 @@ Constants _constants=Constants();
             _listTiles(
                 label: 'My account',
                 fct: () {
-                  // _navigateToProfileScreen(context);
+                  _navigateToProfileScreen(context);
                 },
                 icon: Icons.settings_outlined),
             _listTiles(
@@ -82,14 +82,14 @@ void _navigateToProfileScreen(context) {
   // final FirebaseAuth _auth = FirebaseAuth.instance;
   // final User? user = _auth.currentUser;
   // final uid = user!.uid;
-  // Navigator.pushReplacement(
-  //   context,
-  //   MaterialPageRoute(
-  //     builder: (context) => ProfileScreen(
-  //       userID: uid,
-  //     ),
-  //   ),
-  // );
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => ProfileScreen(
+        // userID: uid,
+      ),
+    ),
+  );
 }
 
 void _navigateToAllWorkerScreen(context) {

@@ -37,6 +37,8 @@ Widget defaultFormField({
   Function? onChange,
   bool isClicked = true,
   Function? onTap,
+  bool enbale = true,
+  TextStyle? style,
   bool isPassword = false,
   required Function validate,
   required String label,
@@ -69,6 +71,8 @@ Widget defaultFormField({
       onTap: () {
         onTap!();
       },
+      style: style,
+      enabled: enbale,
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(
