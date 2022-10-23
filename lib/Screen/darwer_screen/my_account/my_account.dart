@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:tasks_with_firebase/Screen/darwer_screen/my_account/widget/social_buttons.dart';
 import 'package:tasks_with_firebase/constants/constant.dart';
 import 'package:tasks_with_firebase/widgets/drawer_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -11,6 +14,16 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  bool _isLoading = false;
+  String phoneNumber = "";
+  String email = "";
+  String name = "";
+  String job = "";
+  String? imageUrl;
+  String joinedAt = "";
+  bool _isSameUser = false;
+
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -95,9 +108,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        socialButtons( color: Colors.green, function: (){}, icon: Icons.whatsapp_outlined),
-                        socialButtons( color: Colors.orange, function: (){}, icon: Icons.message_outlined),
-                        socialButtons( color: Colors.purple, function: (){}, icon: Icons.call_outlined),
+                        socialButtons( color: Colors.green, function:(){ _openWhatsapp(
+                            context: context,
+                            text: 'hello',
+                            number: phoneNumber);
+                        }, icon: Icons.whatsapp_outlined),
+                        socialButtons( color: Colors.orange, function:_mailTo , icon: Icons.message_outlined),
+                        socialButtons( color: Colors.purple, function: _callPhoneNumber, icon: Icons.call_outlined),
                       ],
                     ),
                     SizedBox(height: 35,),
@@ -147,6 +164,62 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+
+
+  void _openWhatsapp(
+      {required BuildContext context,
+        required String text,
+        required String number}) async {
+    var whatsapp = number; //+92xx enter like this
+    var whatsappURlAndroid =
+        "whatsapp://send?phone=" + whatsapp + "&text=$text";
+    var whatsappURLIos = "https://wa.me/$whatsapp?text=${Uri.tryParse(text)}";
+    if (Platform.isIOS) {
+      // for iOS phone only
+      if (await canLaunchUrl(Uri.parse(whatsappURLIos))) {
+        await launchUrl(Uri.parse(
+          whatsappURLIos,
+        ));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Whatsapp not installed")));
+      }
+    } else {
+      // android , web
+      if (await canLaunchUrl(Uri.parse(whatsappURlAndroid))) {
+        await launchUrl(Uri.parse(whatsappURlAndroid));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Whatsapp not installed")));
+      }
+    }
+  }
+
+  // void _mailTo() async {
+  //   final Uri url = Uri.parse('mailto:$email');
+  //   if (await canLaunchUrl(url)) {
+  //     await launchUrl(url);
+  //   } else {
+  //     throw 'Error occured coulnd\'t open link';
+  //   }
+  // }
+
+  Future<void> _mailTo() async {
+    Uri gmailUrl = Uri.parse("mailto://$email");
+    await canLaunchUrl(gmailUrl)
+        ? await launchUrl(gmailUrl)
+        : print('could_not_launch_this_app');
+  }
+
+  void _callPhoneNumber() async {
+    final Uri phoneUrl = Uri.parse('tel://$phoneNumber');
+    if (await canLaunchUrl(phoneUrl)) {
+      launchUrl(phoneUrl);
+    } else {
+      throw "Error occured coulnd\'t open link";
+    }
   }
 
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../Screen/details_task_screen /details_task.dart';
+
 class TaskWidget extends StatefulWidget {
   const TaskWidget({Key? key}) : super(key: key);
 
@@ -18,7 +20,14 @@ class _TaskWidgetState extends State<TaskWidget> {
       elevation: 8,
       margin: EdgeInsets.all(16),
       child: ListTile(
-        onTap: () {},
+        onTap: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TaskDetails(taskId: '', uploadedBy: '',),
+            ),
+          );
+        },
         onLongPress: () {
           showDialog(context: context, builder: (context){
             return AlertDialog(

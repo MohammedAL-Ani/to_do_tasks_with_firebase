@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tasks_with_firebase/Screen/tasks.dart';
 
 import '../../constants/constant.dart';
 
@@ -92,19 +93,21 @@ class _TaskDetailsState extends State<TaskDetails> {
         automaticallyImplyLeading: false,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        title: TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text(
-            'Back',
-            style: TextStyle(
-                color: Constants.darkBlue,
-                fontStyle: FontStyle.italic,
-                fontSize: 20),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.black54,
           ),
+          onPressed: () { Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TasksScreen(),
+            ),
+          );},
         ),
-      ),
+
+        ),
+
       body: _isLoading
           ? Center(
         child: Text(
