@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../Screen/details_task_screen /details_task.dart';
+import '../../../details_task_screen /details_task.dart';
 
 class TaskWidget extends StatefulWidget {
   const TaskWidget({Key? key}) : super(key: key);

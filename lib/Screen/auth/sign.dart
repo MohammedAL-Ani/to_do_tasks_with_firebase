@@ -1,12 +1,17 @@
+
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tasks_with_firebase/Screen/auth/login.dart';
 import 'package:tasks_with_firebase/share/components/components.dart';
 
-import '../../constants/constant.dart';
+import '../../share/constants/constant.dart';
+import '../../share/error_dialog/error_dialog_handling.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -21,12 +26,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
   var _textPassword = TextEditingController();
 
   var _textPostionCompany = TextEditingController();
+  var _textPhoneNumber = TextEditingController();
 
   final _formKeySign = GlobalKey<FormState>();
 
+
   bool _isPassword = true;
 
-  File? imageFile;
+  String? url;
+
+  File ?  imageFile;
+
+  bool isLoading = false ;
 
   FocusNode _focusFullName = FocusNode();
 
@@ -34,13 +45,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   FocusNode _focusPassword = FocusNode();
 
+  FocusNode _focusPhoneNumber = FocusNode();
+
   FocusNode _focusPostionCompany = FocusNode();
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   void dispose() {
     _textFullName.dispose();
     _textEmailAdress.dispose();
     _textPassword.dispose();
-
+     _textPhoneNumber.dispose();
     _textPostionCompany.dispose();
 
     _focusFullName.dispose();
@@ -48,16 +62,56 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _focusEmailAdress.dispose();
 
     _focusPassword.dispose();
+    _focusPhoneNumber.dispose();
 
     _focusPostionCompany.dispose();
+    super.dispose();
   }
 
-  void submitFormOnSign() {
+  void submitFormOnSign() async {
     final isValid = _formKeySign.currentState!.validate();
     FocusScope.of(context).unfocus();
     if (isValid) {
-      print("Form valid");
-    } else {
+      if (imageFile == null) {
+        GlobalMethods.showErrorDialog(
+            error: 'Please pick up an image', context: context);
+        return;
+      }
+      setState((){
+        isLoading = true;
+      });
+      try {
+      await _auth.createUserWithEmailAndPassword(email: _textEmailAdress.text.toLowerCase().trim(), password: _textPassword.text.trim());
+       final User? user = _auth.currentUser;
+       final _uid = user!.uid;
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('userImages')
+          .child(_uid + '.jpg');
+      await ref.putFile(imageFile!);
+      url = await ref.getDownloadURL();
+       await FirebaseFirestore.instance.collection('users').doc(_uid).set({
+        'id':_uid ,
+        'name': _textFullName.text,
+         'email' : _textEmailAdress.text,
+        'userImageUrl': 'img',
+        'phoneNumber': _textPhoneNumber.text,
+        'positionInCompany': _textPostionCompany.text,
+        'createAt': Timestamp.now(),
+      });
+      Navigator.canPop(context) ? Navigator.pop(context) : null;
+    }catch(error) {
+        setState(() {
+          isLoading = false ;
+        });GlobalMethods.showErrorDialog(
+            error: error.toString(), context: context);
+        print('error occured $error');
+      }
+      }
+    else {
+      setState((){
+        isLoading = false;
+      });
       print("Form not valid");
     }
   }
@@ -87,7 +141,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Text(
                     'Already have an account?',
                   ),
-                  TextButton(
+
+               TextButton(
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -193,7 +248,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       FocusScope.of(context).requestFocus(_focusPassword),
                   type: TextInputType.emailAddress,
                   validate: (String value) {
-                    if (value.isEmpty) {
+                    if (value.isEmpty || !value.contains('@')) {
                       return 'email must not be empty';
                     }
 
@@ -209,7 +264,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 foucs: _focusPassword,
                 next: TextInputAction.next,
                 onEditingComplete: () =>
-                    FocusScope.of(context).requestFocus(_focusPostionCompany),
+                    FocusScope.of(context).requestFocus(_focusPhoneNumber),
                 label: 'Password',
                 prefix: Icons.lock,
                 suffix: _isPassword ? Icons.visibility : Icons.visibility_off,
@@ -231,10 +286,35 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 },
               ),
               SizedBox(
+                height:20,
+              ),
+                  defaultFormField(
+                      controller: _textPhoneNumber,
+                      foucs: _focusPhoneNumber,
+                      onEditingComplete: () =>
+                          FocusScope.of(context).unfocus(),
+                      type: TextInputType.number,
+                      validate: (String value) {
+                        if (value.isEmpty) {
+                          return 'Phone Number must not be empty';
+                        }
+
+                        return null;
+                      },
+                      label: 'Phone Number',
+                      prefix: Icons.call_end),
+              SizedBox(
                 height: 20.0,
               ),
                   GestureDetector(
-                    onTap: () => showJobsDialog(size),
+                    onTap: () {
+                      FocusScopeNode currentFocus = FocusScope.of(context);
+                      if (!currentFocus.hasPrimaryFocus) {
+                        currentFocus.unfocus();
+                      }
+                      showJobsDialog(size);
+
+                    },
                 child: defaultFormField(
                   style:  TextStyle(color: Colors.black),
                     enbale: false,
@@ -255,12 +335,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
               SizedBox(
                 height: 20.0,
               ),
-              Container(
+            isLoading? Center(child: CircularProgressIndicator()) :  Container(
                 decoration: BoxDecoration(
                     color: Colors.indigo,
                     borderRadius: BorderRadius.circular(5.0)),
                 width: double.infinity,
                 child: MaterialButton(
+
                   onPressed: submitFormOnSign,
                   child: Text(
                     'Register',
@@ -274,47 +355,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     );
   }
+
+  XFile? image;
+
   void _pickImageWithCamera() async {
+    var pickedFileCum = await ImagePicker().pickImage(
+        source: ImageSource.camera);
 
-      var pickedFile = await ImagePicker().pickImage(
-          source: ImageSource.camera, maxWidth: 1080, maxHeight: 1080);
+      _cropImage(pickedFileCum!.path);
+    setState(() {
+      // imageFile = File(pickedFileCum!.path);
 
-      _cropImage(pickedFile!.path);
-    // } catch (error) {
-    //   // GlobalMethods.showErrorDialog(error: '$error', context: context);
-    // }
-      setState(() {
-        imageFile = File(pickedFile!.path);
-      });
-
-
+    });
 
     Navigator.pop(context);
+
   }
 
   void _pickImageWithGallery() async {
-
-      var pickedFile = await ImagePicker().pickImage(
-          source: ImageSource.gallery, maxWidth: 1080, maxHeight: 1080);
-
-      _cropImage(pickedFile!.path);
-    // } catch (error) {
-    //   // GlobalMethods.showErrorDialog(error: '$error', context: context);
-    // }
-
-      setState(() {
-        imageFile = File(pickedFile!.path);
-      });
+    var pickedFileGallyer = await ImagePicker().pickImage(
+        source: ImageSource.gallery);
+    _cropImage(pickedFileGallyer!.path);
+    setState(() {
+      // imageFile = File(pickedFileGallyer!.path);
+    });
 
     Navigator.pop(context);
+
   }
 
-  Future _cropImage(filePath) async {
+
+  void _cropImage(filePath) async {
     CroppedFile? mcropImage = await ImageCropper().cropImage(
         sourcePath: filePath, maxHeight: 1080, maxWidth: 1080);
     if (mcropImage != null) {
       setState(() {
-        imageFile =File(mcropImage.path);
+        image =XFile(mcropImage.path);
 
       });
     }
@@ -413,7 +489,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 20,
-                                  // fontWeight: FontWeight.bold,
                                   fontStyle: FontStyle.italic),
                             ),
                           ),

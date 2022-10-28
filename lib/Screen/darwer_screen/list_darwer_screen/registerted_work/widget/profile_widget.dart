@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../../constants/constant.dart';
-import '../../../../widgets/drawer_widget.dart';
+import '../../../../../share/constants/constant.dart';
+import '../../../darwer/drawer_widget.dart';
+
+
 
 class ProfileScreen extends StatefulWidget {
   final String userID;

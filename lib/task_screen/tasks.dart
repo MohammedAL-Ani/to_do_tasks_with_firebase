@@ -1,9 +1,11 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:tasks_with_firebase/widgets/tasks_widgets.dart';
 
-import '../widgets/drawer_widget.dart';
+import '../Screen/darwer_screen/darwer/drawer_widget.dart';
+import '../Screen/darwer_screen/darwer/widget/tasks_widgets.dart';
+
+
 
 class TasksScreen extends StatelessWidget {
 

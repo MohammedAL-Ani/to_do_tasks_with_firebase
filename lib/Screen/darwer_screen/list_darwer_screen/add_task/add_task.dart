@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:tasks_with_firebase/Screen/darwer_screen/darwer/drawer_widget.dart';
 
-import '../../../constants/constant.dart';
-import '../../../widgets/drawer_widget.dart';
+import '../../../../share/constants/constant.dart';
+
+
 
 class AddTaskScreen extends StatefulWidget {
   @override

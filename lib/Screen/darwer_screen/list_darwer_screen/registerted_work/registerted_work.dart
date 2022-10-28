@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../widgets/drawer_widget.dart';
+
+import '../../darwer/drawer_widget.dart';
 
 class AllWorkersScreen extends StatelessWidget {
   @override

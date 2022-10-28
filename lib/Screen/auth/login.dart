@@ -1,7 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tasks_with_firebase/Screen/auth/forget_password.dart';
 import 'package:tasks_with_firebase/Screen/auth/sign.dart';
 import 'package:tasks_with_firebase/share/components/components.dart';
+import 'package:tasks_with_firebase/task_screen/tasks.dart';
+
+import '../../share/error_dialog/error_dialog_handling.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -9,14 +13,18 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  var textEmailAdress = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+
 
   bool isShowText = true;
 
-  var textPassword = TextEditingController();
+  bool _isLoading = false ;
+
+
   FocusNode _passFocusNode = FocusNode();
-  late TextEditingController _emailTextController;
-  late TextEditingController _passTextController;
+   TextEditingController _emailTextController= TextEditingController();
+   TextEditingController _passTextController = TextEditingController();
 
   var _loginFormKey = GlobalKey<FormState>();
 
@@ -29,14 +37,31 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void submitFormOnLogin() {
+  void submitFormOnLogin() async {
     final isValid = _loginFormKey.currentState!.validate();
     FocusScope.of(context).unfocus();
     if (isValid) {
-      print("Form valid");
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        await _auth.signInWithEmailAndPassword(
+            email: _emailTextController.text.toLowerCase().trim(),
+            password: _passTextController.text.trim());
+        Navigator.canPop(context) ? Navigator.pop(context) : null;
+      } catch (error) {
+        setState(() {
+          _isLoading = false;
+        });
+        GlobalMethods.showErrorDialog(
+            error: error.toString(), context: context);
+      }
     } else {
-      print("Form not valid");
+      print('Form not valid');
     }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -65,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         defaultFormField(
-                          controller: textEmailAdress,
+                          controller: _emailTextController,
                           label: 'Email',
                           prefix: Icons.email,
                           type: TextInputType.emailAddress,
@@ -81,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: 15.0,
                         ),
                         defaultFormField(
-                          controller: textPassword,
+                          controller: _passTextController,
                           onEditingComplete: submitFormOnLogin,
                           foucs: _passFocusNode,
                           label: 'Password',

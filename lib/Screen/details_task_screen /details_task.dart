@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tasks_with_firebase/Screen/tasks.dart';
+import 'package:tasks_with_firebase/task_screen/tasks.dart';
 
-import '../../constants/constant.dart';
+import '../../share/constants/constant.dart';
 
 class TaskDetails extends StatefulWidget {
   final String taskId;

@@ -1,15 +1,19 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:tasks_with_firebase/constants/constant.dart';
 
-import '../Screen/darwer_screen/add_task/add_task.dart';
-import '../Screen/darwer_screen/my_account/my_account.dart';
-import '../Screen/darwer_screen/registerted_work/registerted_work.dart';
-import '../Screen/tasks.dart';
+import '../../../share/constants/constant.dart';
+import '../../../task_screen/tasks.dart';
+import '../../user_state.dart';
+import '../list_darwer_screen/add_task/add_task.dart';
+import '../list_darwer_screen/my_account/my_account.dart';
+import '../list_darwer_screen/registerted_work/registerted_work.dart';
+
+
+
 
 class DrawerWidget extends StatelessWidget {
 
-Constants _constants=Constants();
   @override
   Widget build(BuildContext context) {
 
@@ -85,7 +89,7 @@ void _navigateToProfileScreen(context) {
   Navigator.pushReplacement(
     context,
     MaterialPageRoute(
-      builder: (context) => ProfileScreen(
+      builder: (context) => ProfileScreen(userID: '',
         // userID: uid,
       ),
     ),
@@ -119,7 +123,7 @@ void _navigateToTaskScreen(context) {
   );
 }
 void _logout(context) {
-  // final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   showDialog(
       context: context,
       builder: (context) {
@@ -155,14 +159,13 @@ void _logout(context) {
             ),
             TextButton(
                 onPressed: () async {
-                  // await _auth.signOut();
-                  // Navigator.canPop(context) ? Navigator.pop(context) : null;
-                  // Navigator.of(context).pushReplacement(
-                  //   MaterialPageRoute(
-                  //     builder: ()=>
-                  //     // builder: (ctx) => UserState(),
-                  //   ),
-                  // );
+                  await _auth.signOut();
+                  Navigator.canPop(context) ? Navigator.pop(context) : null;
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (ctx) => UserState(),
+                    ),
+                  );
                 },
                 child: Text(
                   'OK',

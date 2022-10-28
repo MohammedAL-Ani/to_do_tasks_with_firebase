@@ -1,13 +1,17 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:tasks_with_firebase/Screen/darwer_screen/my_account/widget/social_buttons.dart';
-import 'package:tasks_with_firebase/constants/constant.dart';
-import 'package:tasks_with_firebase/widgets/drawer_widget.dart';
+import 'package:tasks_with_firebase/Screen/darwer_screen/list_darwer_screen/my_account/widget/social_buttons.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../share/constants/constant.dart';
+import '../../darwer/drawer_widget.dart';
+
+
+
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({Key? key, required String userID}) : super(key: key);
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
