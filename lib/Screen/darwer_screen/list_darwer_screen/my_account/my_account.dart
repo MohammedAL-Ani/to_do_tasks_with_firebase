@@ -1,7 +1,10 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tasks_with_firebase/Screen/darwer_screen/list_darwer_screen/my_account/widget/social_buttons.dart';
+import 'package:tasks_with_firebase/share/error_dialog/error_dialog_handling.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
@@ -27,6 +30,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String joinedAt = "";
   bool _isSameUser = false;
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+
+  void initState() {
+    super.initState();
+    getUserData();
+  }
+
+  void getUserData() async {
+    _isLoading = true;
+    try{
+      final DocumentSnapshot userData = await FirebaseFirestore.instance.collection('users').doc('LJUjaBQJO0abQW5GYXDbPtlwi5N2').get();
+      
+      if(userData ==null ){
+        return;
+      }else{
+        setState(() {
+          email =userData.get('email');
+          name = userData.get('name');
+              phoneNumber= userData.get('phoneNumber');
+              job=userData.get('positionInCompany');
+              Timestamp joinedAtStamp = userData.get('createAt');
+              var joinedDate = joinedAtStamp.toDate();
+              joinedAt = '${joinedDate.year}-${joinedDate.month}-${joinedDate.day}';
+        });
+        User? user = _auth.currentUser;
+        String _uid = user!.uid;
+        //TODO check if same user;
+      }
+    }catch (error){
+      GlobalMethods.showErrorDialog(error: '$error', context: context);
+    } finally{
+      setState((){
+        _isLoading = false;
+      });
+
+
+    }
+
+  }
 
 
 
@@ -66,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     Center(
                       child: Text(
-                        'Name',
+                        name == null ?'':name,
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -77,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     SizedBox(height: 10,),
                     Center(
                       child: Text(
-                        'Job Since joinied data (2022....)',
+                        '$job Since joinied $joinedAt.',
                         style: TextStyle(
                             fontSize: 18,
                             color: Constants.darkBlue,
@@ -100,7 +143,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     SizedBox(height: 10,),
                     Text(
-                      'Email:',
+                      'Email:$email',
                       style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.normal,
@@ -109,7 +152,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     SizedBox(height: 10,),
                     Text(
-                      'Phone Number:',
+                      'Phone Number:$phoneNumber',
                       style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.normal,
