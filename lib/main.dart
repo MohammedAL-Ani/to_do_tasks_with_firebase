@@ -1,9 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:tasks_with_firebase/Screen/auth/login.dart';
-import 'package:tasks_with_firebase/Screen/auth/sign.dart';
+import 'package:tasks_with_firebase/Screen/auth/login/login.dart';
+import 'package:tasks_with_firebase/Screen/auth/sign_in%20/sign.dart';
 import 'package:tasks_with_firebase/task_screen/tasks.dart';
 
+import 'Screen/auth/sign_in /select_photo_options/screens/set_photo_screen.dart';
 import 'Screen/user_state.dart';
 
 void main()  {

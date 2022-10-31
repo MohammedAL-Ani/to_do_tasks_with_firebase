@@ -1,9 +1,9 @@
-// This is a basic Flutter widget test.
+// This is a basic Flutter select_photo_options test.
 //
-// To perform an interaction with a widget in your test, use the WidgetTester
+// To perform an interaction with a select_photo_options in your test, use the WidgetTester
 // utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child darwer in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// gestures. You can also use WidgetTester to find child darwer in the select_photo_options
+// tree, read text, and verify that the values of select_photo_options properties are correct.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:tasks_with_firebase/Screen/auth/forget_password.dart';
-import 'package:tasks_with_firebase/Screen/auth/sign.dart';
+import 'package:tasks_with_firebase/Screen/auth/forget_password/forget_password.dart';
+import 'package:tasks_with_firebase/Screen/auth/sign_in%20/sign.dart';
 import 'package:tasks_with_firebase/share/components/components.dart';
 import 'package:tasks_with_firebase/task_screen/tasks.dart';
 
-import '../../share/error_dialog/error_dialog_handling.dart';
+import '../../../share/error_dialog/error_dialog_handling.dart';
 
 class LoginScreen extends StatefulWidget {
   @override

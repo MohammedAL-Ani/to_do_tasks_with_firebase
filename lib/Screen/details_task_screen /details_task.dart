@@ -48,7 +48,7 @@ class _TaskDetailsState extends State<TaskDetails> {
   //     _isLoading = true;
   //     final DocumentSnapshot userDoc = await FirebaseFirestore.instance
   //         .collection('users')
-  //         .doc(widget.uploadedBy)
+  //         .doc(select_photo_options.uploadedBy)
   //         .get();
   //     if (userDoc == null) {
   //       return;
@@ -61,7 +61,7 @@ class _TaskDetailsState extends State<TaskDetails> {
   //     }
   //     final DocumentSnapshot taskDatabase = await FirebaseFirestore.instance
   //         .collection('tasks')
-  //         .doc(widget.taskId)
+  //         .doc(select_photo_options.taskId)
   //         .get();
   //     if (taskDatabase == null) {
   //       return;

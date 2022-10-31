@@ -38,11 +38,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   //
   // void getUserDate() async {
   //   _isLoading = true;
-  //   print('uid ${widget.userID}');
+  //   print('uid ${select_photo_options.userID}');
   //   try {
   //     final DocumentSnapshot userDoc = await FirebaseFirestore.instance
   //         .collection('users')
-  //         .doc(widget.userID)
+  //         .doc(select_photo_options.userID)
   //         .get();
   //
   //     if (userDoc == null) {
@@ -61,7 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   //       User? user = _auth.currentUser;
   //       String _uid = user!.uid;
   //       setState(() {
-  //         _isSameUser = _uid == widget.userID;
+  //         _isSameUser = _uid == select_photo_options.userID;
   //       });
   //       print('_isSameUser $_isSameUser');
   //     }
