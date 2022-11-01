@@ -9,12 +9,12 @@ import 'package:tasks_with_firebase/share/error_dialog/error_dialog_handling.dar
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../share/constants/constant.dart';
+import '../../../user_state.dart';
 import '../../darwer/drawer_widget.dart';
 
-
-
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key, required String userID}) : super(key: key);
+  final String userID ;
+  const ProfileScreen({Key? key, required this.userID,}) : super(key: key);
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -32,58 +32,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-
   void initState() {
     super.initState();
     getUserData();
+
   }
 
   void getUserData() async {
     _isLoading = true;
-    try{
-      final DocumentSnapshot userData = await FirebaseFirestore.instance.collection('users').doc('LJUjaBQJO0abQW5GYXDbPtlwi5N2').get();
-      
-      if(userData ==null ){
+    try {
+      final DocumentSnapshot userData = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.userID)
+          .get();
+
+      if (userData == null) {
         return;
-      }else{
+      } else {
         setState(() {
-          email =userData.get('email');
+
+          email = userData.get('email');
           name = userData.get('name');
-              phoneNumber= userData.get('phoneNumber');
-              job=userData.get('positionInCompany');
-              Timestamp joinedAtStamp = userData.get('createAt');
-              var joinedDate = joinedAtStamp.toDate();
-              joinedAt = '${joinedDate.year}-${joinedDate.month}-${joinedDate.day}';
+          phoneNumber = userData.get('phoneNumber');
+          job = userData.get('positionInCompany');
+          imageUrl = userData.get('userImageUrl');
+          Timestamp joinedAtStamp = userData.get('createAt');
+          var joinedDate = joinedAtStamp.toDate();
+          joinedAt = '${joinedDate.year}-${joinedDate.month}-${joinedDate.day}';
         });
         User? user = _auth.currentUser;
         String _uid = user!.uid;
         //TODO check if same user;
       }
-    }catch (error){
+    } catch (error) {
       GlobalMethods.showErrorDialog(error: '$error', context: context);
-    } finally{
-      setState((){
+    } finally {
+      setState(() {
         _isLoading = false;
       });
-
-
     }
-
   }
-
-
-
-
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-
       drawer: DrawerWidget(),
       appBar: AppBar(
         elevation: 0,
@@ -93,140 +86,170 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: Center(
         child: SingleChildScrollView(
           child: Stack(
-            children:[ Card(
-              margin: EdgeInsets.all(30),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
+            children: [
+              Card(
+                margin: EdgeInsets.all(30),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
 
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 80,
-                    ),
-                    Center(
-                      child: Text(
-                        name == null ?'':name,
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FontStyle.normal
+                      SizedBox(
+                        height: 80,
+                      ),
+                      Center(
+                        child: Text(
+                          name == null ? '' : name,
+                          style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.normal),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 10,),
-                    Center(
-                      child: Text(
-                        '$job Since joinied $joinedAt.',
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Center(
+                        child: Text(
+                          '$job Since joinied $joinedAt.',
+                          style: TextStyle(
+                              fontSize: 18,
+                              color: Constants.darkBlue,
+                              fontWeight: FontWeight.normal,
+                              fontStyle: FontStyle.normal),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Divider(
+                        thickness: 1,
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        'Contact Info',
                         style: TextStyle(
-                            fontSize: 18,
-                            color: Constants.darkBlue,
+                            fontSize: 22,
+                            color: Colors.purple,
                             fontWeight: FontWeight.normal,
-                            fontStyle: FontStyle.normal
-                        ),
+                            fontStyle: FontStyle.italic),
                       ),
-                    ),
-                    SizedBox(height: 15,),
-                    Divider(thickness: 1,),
-                    SizedBox(height: 20,),
-                    Text(
-                      'Contact Info',
-                      style: TextStyle(
-                          fontSize: 22,
-                          color: Colors.purple,
-                          fontWeight: FontWeight.normal,
-                          fontStyle: FontStyle.italic
+                      SizedBox(
+                        height: 10,
                       ),
-                    ),
-                    SizedBox(height: 10,),
-                    Text(
-                      'Email:$email',
-                      style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.normal,
-                          fontStyle: FontStyle.normal
+                      Text(
+                        'Email:$email',
+                        style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.normal,
+                            fontStyle: FontStyle.normal),
                       ),
-                    ),
-                    SizedBox(height: 10,),
-                    Text(
-                      'Phone Number:$phoneNumber',
-                      style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.normal,
-                          fontStyle: FontStyle.normal
+                      SizedBox(
+                        height: 10,
                       ),
-                    ),
-                    SizedBox(height: 20,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        socialButtons( color: Colors.green, function:(){ _openWhatsapp(
-                            context: context,
-                            text: 'hello',
-                            number: phoneNumber);
-                        }, icon: Icons.whatsapp_outlined),
-                        socialButtons( color: Colors.orange, function:_mailTo , icon: Icons.message_outlined),
-                        socialButtons( color: Colors.purple, function: _callPhoneNumber, icon: Icons.call_outlined),
-                      ],
-                    ),
-                    SizedBox(height: 35,),
-                    Divider(thickness: 1,
-                     ),
-                    SizedBox(height: 15,),
-                    Center(
-                      child: TextButton.icon(onPressed:(){} ,icon:Icon( Icons.logout_outlined,size: 32,),
-                        label:Text('Log out',style: TextStyle(
-                          fontSize: 28,
-                        ),)
-            ),
-                    )
+                      Text(
+                        'Phone Number:$phoneNumber',
+                        style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.normal,
+                            fontStyle: FontStyle.normal),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          socialButtons(
+                              color: Colors.green,
+                              function: () {
+                                _openWhatsapp(
+                                    context: context,
+                                    text: 'hello',
+                                    number: phoneNumber);
+                              },
+                              icon: Icons.whatsapp_outlined),
+                          socialButtons(
+                              color: Colors.orange,
+                              function: _mailTo,
+                              icon: Icons.message_outlined),
+                          socialButtons(
+                              color: Colors.purple,
+                              function: _callPhoneNumber,
+                              icon: Icons.call_outlined),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 35,
+                      ),
+                      Divider(
+                        thickness: 1,
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Center(
+                        child: TextButton.icon(
+                            onPressed: _logOut,
+                            icon: Icon(
+                              Icons.logout_outlined,
+                              size: 32,
+                            ),
+                            label: Text(
+                              'Log out',
+                              style: TextStyle(
+                                fontSize: 28,
+                              ),
+                            )),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                // right: 10,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
 
+
+
+                Container(
+                width: size.width * 0.26,
+                    height: size.width * 0.26,
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            width: 5,
+                            color: Theme.of(context).scaffoldBackgroundColor),
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                            image: NetworkImage(
+                              imageUrl == null
+                                  ? 'https://cdn.icon-icons.com/icons2/2643/PNG/512/male_boy_person_people_avatar_icon_159358.png'
+                                  : imageUrl!,
+                            ),
+                            fit: BoxFit.fill)),
+                ),
                   ],
                 ),
               ),
-            ),
-        Positioned(
-          // right: 10,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: size.width * 0.26,
-                height: size.width * 0.26,
-                decoration: BoxDecoration(
-                    border: Border.all(
-                        width: 5,
-                        color: Theme.of(context)
-                            .scaffoldBackgroundColor),
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                        image: NetworkImage(
-                          // imageUrl == null
-                          //     ?
-                        'https://cdn.icon-icons.com/icons2/2643/PNG/512/male_boy_person_people_avatar_icon_159358.png'
-                              // : imageUrl!,
-                        ),
-                        fit: BoxFit.fill)),
-              )
             ],
-          ),
-        ),
-    ],
           ),
         ),
       ),
     );
   }
 
-
-
   void _openWhatsapp(
       {required BuildContext context,
-        required String text,
-        required String number}) async {
+      required String text,
+      required String number}) async {
     var whatsapp = number; //+92xx enter like this
     var whatsappURlAndroid =
         "whatsapp://send?phone=" + whatsapp + "&text=$text";
@@ -252,14 +275,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  // void _mailTo() async {
-  //   final Uri url = Uri.parse('mailto:$email');
-  //   if (await canLaunchUrl(url)) {
-  //     await launchUrl(url);
-  //   } else {
-  //     throw 'Error occured coulnd\'t open link';
-  //   }
-  // }
+  void _logOut() async {
+    await _auth.signOut();
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (ctx) => UserState(),
+      ),
+    );
+  }
 
   Future<void> _mailTo() async {
     Uri gmailUrl = Uri.parse("mailto://$email");
@@ -276,6 +299,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
       throw "Error occured coulnd\'t open link";
     }
   }
-
-
 }

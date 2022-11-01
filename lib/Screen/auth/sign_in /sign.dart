@@ -100,7 +100,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           'id': _uid,
           'name': _textFullName.text,
           'email': _textEmailAdress.text,
-          'userImageUrl': 'img',
+          'userImageUrl': url,
           'phoneNumber': _textPhoneNumber.text,
           'positionInCompany': _textPostionCompany.text,
           'createAt': Timestamp.now(),
@@ -190,7 +190,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       File? img = File(image.path);
       img = await _cropImage(imageFile: img);
       setState(() {
-        _imageFile = img;
+         _imageFile = img;
         Navigator.of(context).pop();
       });
     }  catch (e) {
@@ -403,63 +403,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
 
-
-  // void _showImageDialog() {
-  //   showDialog(
-  //       context: context,
-  //       builder: (context) {
-  //         return AlertDialog(
-  //           title: Text('Please choose an option'),
-  //           content: Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: [
-  //               InkWell(
-  //                 onTap: _pickImageWithCamera,
-  //                 child: Padding(
-  //                   padding: const EdgeInsets.all(4.0),
-  //                   child: Row(
-  //                     children: [
-  //                       Icon(
-  //                         Icons.camera_alt_outlined,
-  //                         color: Colors.indigo,
-  //                       ),
-  //                       SizedBox(
-  //                         width: 7,
-  //                       ),
-  //                       Text(
-  //                         'Camera',
-  //                         style: TextStyle(color: Colors.indigo),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 ),
-  //               ),
-  //               InkWell(
-  //                 onTap: _pickImageWithGallery,
-  //                 child: Padding(
-  //                   padding: const EdgeInsets.all(4.0),
-  //                   child: Row(
-  //                     children: [
-  //                       Icon(
-  //                         Icons.image,
-  //                         color: Colors.indigo,
-  //                       ),
-  //                       SizedBox(
-  //                         width: 7,
-  //                       ),
-  //                       Text(
-  //                         'Gallery',
-  //                         style: TextStyle(color: Colors.indigo),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 ),
-  //               )
-  //             ],
-  //           ),
-  //         );
-  //       });
-  // }
 
 
 }

@@ -83,13 +83,13 @@ class DrawerWidget extends StatelessWidget {
   }
 
 void _navigateToProfileScreen(context) {
-  // final FirebaseAuth _auth = FirebaseAuth.instance;
-  // final User? user = _auth.currentUser;
-  // final uid = user!.uid;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final User? user = _auth.currentUser;
+  final uid = user!.uid;
   Navigator.pushReplacement(
     context,
     MaterialPageRoute(
-      builder: (context) => ProfileScreen(userID: '',
+      builder: (context) => ProfileScreen(userID:uid ,
         // userID: uid,
       ),
     ),
