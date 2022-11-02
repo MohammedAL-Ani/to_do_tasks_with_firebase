@@ -62,7 +62,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
         User? user = _auth.currentUser;
         String _uid = user!.uid;
-        //TODO check if same user;
+        setState(() {
+          _isSameUser = _uid == widget.userID;
+        });
       }
     } catch (error) {
       GlobalMethods.showErrorDialog(error: '$error', context: context);
@@ -83,164 +85,169 @@ class _ProfileScreenState extends State<ProfileScreen> {
         iconTheme: IconThemeData(color: Colors.black),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Stack(
-            children: [
-              Card(
-                margin: EdgeInsets.all(30),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                      SizedBox(
-                        height: 80,
-                      ),
-                      Center(
-                        child: Text(
-                          name == null ? '' : name,
-                          style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              fontStyle: FontStyle.normal),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Center(
-                        child: Text(
-                          '$job Since joinied $joinedAt.',
-                          style: TextStyle(
-                              fontSize: 18,
-                              color: Constants.darkBlue,
-                              fontWeight: FontWeight.normal,
-                              fontStyle: FontStyle.normal),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 15,
-                      ),
-                      Divider(
-                        thickness: 1,
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Text(
-                        'Contact Info',
-                        style: TextStyle(
-                            fontSize: 22,
-                            color: Colors.purple,
-                            fontWeight: FontWeight.normal,
-                            fontStyle: FontStyle.italic),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        'Email:$email',
-                        style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.normal,
-                            fontStyle: FontStyle.normal),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        'Phone Number:$phoneNumber',
-                        style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.normal,
-                            fontStyle: FontStyle.normal),
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          socialButtons(
-                              color: Colors.green,
-                              function: () {
-                                _openWhatsapp(
-                                    context: context,
-                                    text: 'hello',
-                                    number: phoneNumber);
-                              },
-                              icon: Icons.whatsapp_outlined),
-                          socialButtons(
-                              color: Colors.orange,
-                              function: _mailTo,
-                              icon: Icons.message_outlined),
-                          socialButtons(
-                              color: Colors.purple,
-                              function: _callPhoneNumber,
-                              icon: Icons.call_outlined),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 35,
-                      ),
-                      Divider(
-                        thickness: 1,
-                      ),
-                      SizedBox(
-                        height: 15,
-                      ),
-                      Center(
-                        child: TextButton.icon(
-                            onPressed: _logOut,
-                            icon: Icon(
-                              Icons.logout_outlined,
-                              size: 32,
-                            ),
-                            label: Text(
-                              'Log out',
-                              style: TextStyle(
-                                fontSize: 28,
-                              ),
-                            )),
-                      )
-                    ],
-                  ),
-                ),
+      body: _isLoading
+          ? Center(
+        child: CircularProgressIndicator()
+      )
+          :
+      SingleChildScrollView(
+        child: Stack(
+          children: [
+            Card(
+              margin: EdgeInsets.all(30),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
               ),
-              Positioned(
-                // right: 10,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
 
-
-
-                Container(
-                width: size.width * 0.26,
-                    height: size.width * 0.26,
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                            width: 5,
-                            color: Theme.of(context).scaffoldBackgroundColor),
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                            image: NetworkImage(
-                              imageUrl == null
-                                  ? 'https://cdn.icon-icons.com/icons2/2643/PNG/512/male_boy_person_people_avatar_icon_159358.png'
-                                  : imageUrl!,
+                    SizedBox(
+                      height: 80,
+                    ),
+                    Center(
+                      child: Text(
+                        name == null ? '' : name,
+                        style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            fontStyle: FontStyle.normal),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Center(
+                      child: Text(
+                        '$job Since joinied $joinedAt.',
+                        style: TextStyle(
+                            fontSize: 18,
+                            color: Constants.darkBlue,
+                            fontWeight: FontWeight.normal,
+                            fontStyle: FontStyle.normal),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Divider(
+                      thickness: 1,
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      'Contact Info',
+                      style: TextStyle(
+                          fontSize: 22,
+                          color: Colors.purple,
+                          fontWeight: FontWeight.normal,
+                          fontStyle: FontStyle.italic),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'Email:$email',
+                      style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.normal,
+                          fontStyle: FontStyle.normal),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'Phone Number:$phoneNumber',
+                      style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.normal,
+                          fontStyle: FontStyle.normal),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        socialButtons(
+                            color: Colors.green,
+                            function: () {
+                              _openWhatsapp(
+                                  context: context,
+                                  text: 'hello',
+                                  number: phoneNumber);
+                            },
+                            icon: Icons.whatsapp_outlined),
+                        socialButtons(
+                            color: Colors.orange,
+                            function: _mailTo,
+                            icon: Icons.message_outlined),
+                        socialButtons(
+                            color: Colors.purple,
+                            function: _callPhoneNumber,
+                            icon: Icons.call_outlined),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 35,
+                    ),
+                    _isSameUser==false ? Container():
+                    Divider(
+                      thickness: 1,
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    _isSameUser==false ? Container():
+                    Center(
+                      child: TextButton.icon(
+                          onPressed: _logOut,
+                          icon: Icon(
+                            Icons.logout_outlined,
+                            size: 32,
+                          ),
+                          label: Text(
+                            'Log out',
+                            style: TextStyle(
+                              fontSize: 28,
                             ),
-                            fit: BoxFit.fill)),
-                ),
+                          )),
+                    )
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+            Positioned(
+              // right: 10,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+
+
+
+              Container(
+              width: size.width * 0.26,
+                  height: size.width * 0.26,
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                          width: 5,
+                          color: Theme.of(context).scaffoldBackgroundColor),
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                          image: NetworkImage(
+                            imageUrl == null
+                                ? 'https://cdn.icon-icons.com/icons2/2643/PNG/512/male_boy_person_people_avatar_icon_159358.png'
+                                : imageUrl!,
+                          ),
+                          fit: BoxFit.fill)),
+              ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

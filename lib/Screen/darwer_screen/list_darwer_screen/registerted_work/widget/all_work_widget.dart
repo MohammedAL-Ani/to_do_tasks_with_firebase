@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 import '../../my_account/my_account.dart';
@@ -23,9 +24,13 @@ class AllWorkersWidget extends StatefulWidget {
 }
 
 class _AllWorkersWidgetState extends State<AllWorkersWidget> {
+
+  bool _isLoading = false;
   @override
   Widget build(BuildContext context) {
-    return Card(
+    Size size = MediaQuery.of(context).size;
+    return _isLoading? const Center(child: CircularProgressIndicator()):
+      Card(
       elevation: 8.0,
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: ListTile(
@@ -40,27 +45,29 @@ class _AllWorkersWidgetState extends State<AllWorkersWidget> {
               ),
             );
           },
-          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          leading: Container(
-            padding: EdgeInsets.only(right: 12.0),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+          leading:  Container(
+            width: size.width * 0.26,
+            height: size.width * 0.26,
             decoration: BoxDecoration(
-              border: Border(
-                right: BorderSide(width: 1.0),
-              ),
-            ),
-            child: CircleAvatar(
-              backgroundColor: Colors.transparent,
-              radius: 20,
-              child: Image.network(widget.userImageUrl == null
-                  ? 'https://cdn.icon-icons.com/icons2/2643/PNG/512/male_boy_person_people_avatar_icon_159358.png'
-                  : widget.userImageUrl),
-            ),
+                border: Border.all(
+                    width: 5,
+                    color: Theme.of(context).scaffoldBackgroundColor),
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                    image: NetworkImage(
+                     widget. userImageUrl == null
+                          ? 'https://cdn.icon-icons.com/icons2/2643/PNG/512/male_boy_person_people_avatar_icon_159358.png'
+                          : widget. userImageUrl!,
+                    ),
+                    fit: BoxFit.fill)),
           ),
           title: Text(
             widget.userName,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 16,
+                fontWeight: FontWeight.bold,color: Colors.black),
           ),
           subtitle: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -84,19 +91,18 @@ class _AllWorkersWidgetState extends State<AllWorkersWidget> {
               size: 30,
               color: Colors.pink[800],
             ),
-            onPressed:(){}
-            // _mailTo,
+            onPressed:_mailTo,
           )),
     );
   }
+  Future<void> _mailTo() async {
+    Uri gmailUrl = Uri.parse("mailto://${widget.userEmail}");
+    await canLaunchUrl(gmailUrl)
+        ? await launchUrl(gmailUrl)
+        : print('could_not_launch_this_app');
+  }
 }
 
-  // void _mailTo() async {
-  //   print('select_photo_options.userEmail ${select_photo_options.userEmail}');
-  //   var url = 'mailto:${select_photo_options.userEmail}';
-  //   if (await canLaunch(url)) {
-  //     await launch(url);
-  //   } else {
-  //     throw 'Error occured coulnd\'t open link';
-  //   }
-  // }
+
+
+

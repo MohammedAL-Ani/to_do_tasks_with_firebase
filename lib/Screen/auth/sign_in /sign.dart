@@ -274,7 +274,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ],
               ),
               SizedBox(
-                height: 30.0,
+                height: 15.0,
               ),
               
                   GestureDetector(
@@ -283,6 +283,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                     ),
                   ),
+                  defaultFormField(
+                      controller: _textFullName,
+                      foucs: _focusFullName,
+                      onEditingComplete: () =>
+                          FocusScope.of(context).requestFocus(_focusEmailAdress),
+                      type: TextInputType.text,
+                      validate: (String value) {
+                        if (value.isEmpty ) {
+                          return 'full name must not be empty';
+                        }
+
+                        return null;
+                      },
+                      label: 'Full Name',
+                      prefix: Icons.person),
 
               SizedBox(
                 height: 15.0,
