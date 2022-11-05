@@ -1,7 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tasks_with_firebase/Screen/darwer_screen/darwer/drawer_widget.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../../share/constants/constant.dart';
+import '../../../../share/error_dialog/error_dialog_handling.dart';
 
 
 
@@ -21,9 +26,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   TextEditingController(text: 'pick up a date');
   final _formKey = GlobalKey<FormState>();
   DateTime? picked;
-  // final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isLoading = false;
-  // Timestamp? _deadlineDateTimeStamp;
+  Timestamp? _deadlineDateTimeStamp;
   @override
   void dispose() {
     super.dispose();
@@ -33,56 +38,58 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     _deadlineDateController.dispose();
   }
 
-  // void uploadFct() async {
-  //   User? user = _auth.currentUser;
-  //   String _uid = user!.uid;
-  //   final isValid = _formKey.currentState!.validate();
-  //   FocusScope.of(context).unfocus();
-  //   if (isValid) {
-  //     if (_deadlineDateController.text == 'pick up a date' ||
-  //         _categoryController.text == 'Task Category') {
-  //       GlobalMethods.showErrorDialog(
-  //           error: 'Please pick up everything', context: context);
-  //       return;
-  //     }
-  //     setState(() {
-  //       _isLoading = true;
-  //     });
-  //     final taskID = Uuid().v4();
-  //     try {
-  //       await FirebaseFirestore.instance.collection('tasks').doc(taskID).set({
-  //         'taskId': taskID,
-  //         'uploadedBy': _uid,
-  //         'taskTitle': _titleController.text,
-  //         'taskDescription': _descriptionController.text,
-  //         'deadlineDate': _deadlineDateController.text,
-  //         'deadlineDateTimeStamp': _deadlineDateTimeStamp,
-  //         'taskCategory': _categoryController.text,
-  //         'taskComments': [],
-  //         'isDone': false,
-  //         'createdAt': Timestamp.now(),
-  //       });
-  //       Fluttertoast.showToast(
-  //           msg: "Task has been uploaded successfuly",
-  //           toastLength: Toast.LENGTH_LONG,
-  //           gravity: ToastGravity.CENTER,
-  //           fontSize: 16.0);
-  //       // _categoryController.clear();
-  //       _descriptionController.clear();
-  //       _titleController.clear();
-  //       setState(() {
-  //         _categoryController.text = 'Task Category';
-  //         _deadlineDateController.text = 'pick up a date';
-  //       });
-  //     } catch (error) {} finally {
-  //       setState(() {
-  //         _isLoading = false;
-  //       });
-  //     }
-  //   } else {
-  //     print('Form not valid');
-  //   }
-  // }
+  void uploadFct() async {
+    User? user = _auth.currentUser;
+    String _uid = user!.uid;
+    final isValid = _formKey.currentState!.validate();
+    FocusScope.of(context).unfocus();
+    if (isValid) {
+      if (_deadlineDateController.text == 'pick up a date' ||
+          _categoryController.text == 'Task Category') {
+        GlobalMethods.showErrorDialog(
+            error: 'Please pick up everything', context: context);
+        return;
+      }
+      setState(() {
+        _isLoading = true;
+      });
+      final taskID = Uuid().v4();
+      try {
+        await FirebaseFirestore.instance.collection('tasks').doc(taskID).set({
+          'taskId': taskID,
+          'uploadedBy': _uid,
+          'taskTitle': _titleController.text,
+          'taskDescription': _descriptionController.text,
+          'deadlineDate': _deadlineDateController.text,
+          'deadlineDateTimeStamp': _deadlineDateTimeStamp,
+          'taskCategory': _categoryController.text,
+          'taskComments': [],
+          'isDone': false,
+          'createdAt': Timestamp.now(),
+        });
+        Fluttertoast.showToast(
+            msg: "Task has been uploaded successfuly",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.CENTER,
+            fontSize: 16.0);
+        // _categoryController.clear();
+        _descriptionController.clear();
+        _titleController.clear();
+        setState(() {
+          _categoryController.text = 'Task Category';
+          _deadlineDateController.text = 'pick up a date';
+        });
+      } catch (error) {
+        print( 'this error is $error');
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } else {
+      print('Form not valid');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -163,8 +170,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                           child: _isLoading
                               ? CircularProgressIndicator()
                               : MaterialButton(
-                            onPressed: (){},
-                            // uploadFct,
+                            onPressed: uploadFct,
                             color: Colors.pink.shade700,
                             elevation: 10,
                             shape: RoundedRectangleBorder(
@@ -219,12 +225,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         lastDate: DateTime(2100));
 
     if (picked != null) {
-      // setState(() {
-      //   _deadlineDateTimeStamp = Timestamp.fromMicrosecondsSinceEpoch(
-      //       picked!.microsecondsSinceEpoch);
-      //   _deadlineDateController.text =
-      //   '${picked!.year}-${picked!.month}-${picked!.day}';
-      // });
+      setState(() {
+        _deadlineDateTimeStamp = Timestamp.fromMicrosecondsSinceEpoch(
+            picked!.microsecondsSinceEpoch);
+        _deadlineDateController.text =
+        '${picked!.year}-${picked!.month}-${picked!.day}';
+      });
     }
   }
 
