@@ -7,7 +7,8 @@ import '../../../task_screen/tasks.dart';
 import '../../user_state.dart';
 import '../list_darwer_screen/add_task/add_task.dart';
 import '../list_darwer_screen/my_account/my_account.dart';
-import '../list_darwer_screen/registerted_work/registerted_work.dart';
+import '../registerted_work/registerted_work.dart';
+
 
 
 

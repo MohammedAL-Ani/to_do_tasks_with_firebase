@@ -1,10 +1,11 @@
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:tasks_with_firebase/Screen/darwer_screen/list_darwer_screen/registerted_work/widget/all_work_widget.dart';
+import 'package:tasks_with_firebase/Screen/darwer_screen/registerted_work/widget/all_work_widget.dart';
 
-
-import '../../darwer/drawer_widget.dart';
+import '../darwer/drawer_widget.dart';
 
 class AllWorkersScreen extends StatelessWidget {
 

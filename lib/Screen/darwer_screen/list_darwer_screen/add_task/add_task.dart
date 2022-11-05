@@ -72,7 +72,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             toastLength: Toast.LENGTH_LONG,
             gravity: ToastGravity.CENTER,
             fontSize: 16.0);
-        // _categoryController.clear();
+
         _descriptionController.clear();
         _titleController.clear();
         setState(() {

@@ -1,8 +1,11 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../list_darwer_screen/my_account/my_account.dart';
 
-import '../../my_account/my_account.dart';
+
 
 class AllWorkersWidget extends StatefulWidget {
   final String userID;
@@ -30,7 +33,7 @@ class _AllWorkersWidgetState extends State<AllWorkersWidget> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return _isLoading? const Center(child: CircularProgressIndicator()):
-      Card(
+    Card(
       elevation: 8.0,
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: ListTile(
@@ -56,7 +59,7 @@ class _AllWorkersWidgetState extends State<AllWorkersWidget> {
                 shape: BoxShape.circle,
                 image: DecorationImage(
                     image: NetworkImage(
-                     widget. userImageUrl == null
+                      widget. userImageUrl == null
                           ? 'https://cdn.icon-icons.com/icons2/2643/PNG/512/male_boy_person_people_avatar_icon_159358.png'
                           : widget. userImageUrl!,
                     ),
@@ -102,7 +105,5 @@ class _AllWorkersWidgetState extends State<AllWorkersWidget> {
         : print('could_not_launch_this_app');
   }
 }
-
-
 
 

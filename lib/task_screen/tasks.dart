@@ -1,26 +1,25 @@
 
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:tasks_with_firebase/share/constants/constant.dart';
 
 import '../Screen/darwer_screen/darwer/drawer_widget.dart';
 import '../Screen/darwer_screen/darwer/widget/tasks_widgets.dart';
 
 
 
-class TasksScreen extends StatelessWidget {
+class TasksScreen extends StatefulWidget {
 
 
-  List<String> taskCategoryList = [
-  'Business',
- 'Programming',
-  'Information Technology',
-  'Human resources',
-  'Marketing',
- 'Desgin',
-  'Accounting',
-  ];
+  @override
+  State<TasksScreen> createState() => _TasksScreenState();
+}
 
+class _TasksScreenState extends State<TasksScreen> {
 
+  String? taksCategory;
+  bool _isLoading =false;
 
   @override
   Widget build(BuildContext context) {
@@ -29,13 +28,7 @@ class TasksScreen extends StatelessWidget {
       drawer: DrawerWidget(),
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.black),
-        // leading: IconButton(
-        //   icon: Icon(
-        //     Icons.menu,
-        //     color: Colors.black54,
-        //   ),
-        //   onPressed: () {},
-        // ),
+
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: Text('Tasks'),
         actions: [IconButton(onPressed: () {
@@ -48,26 +41,33 @@ class TasksScreen extends StatelessWidget {
             width: size.width*0.9,
             child: ListView.builder(
               shrinkWrap: true,
-                itemCount: taskCategoryList.length,
+                itemCount: Constants.taskCategoryList.length,
                 itemBuilder: (BuildContext context, int index) {
-              return Row(
-                children: [
+              return GestureDetector(
+                onTap: (){
+                  setState(() {
+                    taksCategory=Constants.taskCategoryList[index];
+                  });
+                },
+                child: Row(
+                  children: [
 
-                  Icon(
-                    Icons.check_circle_outline_rounded,
-                    color:Colors.pink,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      taskCategoryList[index],
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontStyle: FontStyle.italic
-                      ),
+                    Icon(
+                      Icons.check_circle_outline_rounded,
+                      color:Colors.pink,
                     ),
-                  )
-                ],
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        Constants.taskCategoryList[index],
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontStyle: FontStyle.italic
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               );
             }),
           ),
@@ -80,9 +80,9 @@ class TasksScreen extends StatelessWidget {
             ),
             TextButton(
                 onPressed: () {
-                  // setState(() {
-                  //   taksCategory = null;
-                  // });
+                  setState(() {
+                    taksCategory = null;
+                  });
                   Navigator.canPop(context) ? Navigator.pop(context) : null;
                 },
                 child: Text('Cancel filter'))
@@ -90,9 +90,45 @@ class TasksScreen extends StatelessWidget {
           });
         }, icon: Icon(Icons.filter_list,color: Colors.black,))],
       ),
-      body: ListView.builder(itemBuilder: (BuildContext context, int index) {
-        return TaskWidget();
-      }),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('tasks')
+            .where('taskCategory', isEqualTo:'Business' )
+            .orderBy('createdAt', descending: true)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.connectionState == ConnectionState.active) {
+            if (snapshot.data!.docs.isEmpty) {
+              return Center(
+                child: Text('No tasks has been uploaded'),
+              );
+            } else {
+              return ListView.builder(
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return TaskWidget(
+                      taskTitle: snapshot.data!.docs[index]['taskTitle'],
+                      taskDescription: snapshot.data!.docs[index]
+                      ['taskDescription'],
+                      taskId: snapshot.data!.docs[index]['taskId'],
+                      uploadedBy: snapshot.data!.docs[index]['uploadedBy'],
+                      isDone: snapshot.data!.docs[index]['isDone'],
+                    );
+                  });
+
+            }
+          }
+          return Center(
+            child: Text('Something went wrong'),
+          );
+        },
+      ),
+
+
     );
   }
 }

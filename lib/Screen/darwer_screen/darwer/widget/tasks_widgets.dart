@@ -4,7 +4,19 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../details_task_screen /details_task.dart';
 
 class TaskWidget extends StatefulWidget {
-  const TaskWidget({Key? key}) : super(key: key);
+  final String taskTitle;
+  final String taskDescription;
+  final String taskId;
+  final String uploadedBy;
+  final bool isDone;
+
+  const TaskWidget(
+      {required this.taskTitle,
+        required this.taskDescription,
+        required this.taskId,
+        required this.uploadedBy,
+        required this.isDone});
+
 
   @override
   State<TaskWidget> createState() => _TaskWidgetState();
@@ -57,14 +69,17 @@ class _TaskWidgetState extends State<TaskWidget> {
               BoxDecoration(border: Border(right: BorderSide(width: 1.0))),
           child: CircleAvatar(
             backgroundColor: Colors.transparent,
-            radius: 20, //  'assets/images/done.svg'
-            child: SvgPicture.asset(
+            radius: 20,
+            child: widget.isDone? SvgPicture.asset(
+              'assets/images/done.svg',
+            ):
+            SvgPicture.asset(
               'assets/images/timer.svg',
             ),
           ),
         ),
         title: Text(
-          'Title',
+          widget.taskTitle,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -78,7 +93,7 @@ class _TaskWidgetState extends State<TaskWidget> {
               color: Colors.pink.shade800,
             ),
             Text(
-              'Subtitle/Descrption',
+              widget.taskDescription,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 16),
