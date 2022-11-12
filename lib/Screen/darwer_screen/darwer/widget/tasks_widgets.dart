@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tasks_with_firebase/share/error_dialog/error_dialog_handling.dart';
 
 import '../../../details_task_screen /details_task.dart';
 
@@ -21,6 +24,7 @@ class TaskWidget extends StatefulWidget {
   @override
   State<TaskWidget> createState() => _TaskWidgetState();
 }
+FirebaseAuth _auth = FirebaseAuth.instance;
 
 class _TaskWidgetState extends State<TaskWidget> {
   @override
@@ -51,7 +55,18 @@ class _TaskWidgetState extends State<TaskWidget> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
                     TextButton.icon(
-                        onPressed: (){}, icon:Icon(Icons.delete,color: Colors.pink,size: 24.0,),
+                        onPressed: (){
+                          User? user = _auth.currentUser;
+                          String _uid = user!.uid;
+                          if (_uid == widget.uploadedBy){
+                            FirebaseFirestore.instance.collection('tasks').doc(widget.taskId).delete();
+                            Navigator.pop(context);
+                          }else {
+                            GlobalMethods.showErrorDialog(error: 'you don\'t have access to delete this tasks', context: context);
+                          }
+
+
+                        }, icon:Icon(Icons.delete,color: Colors.pink,size: 24.0,),
                         label:Text("Delete",style: TextStyle(
                           color: Colors.pink,
                           fontSize: 20,

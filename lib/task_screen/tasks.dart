@@ -36,7 +36,7 @@ class _TasksScreenState extends State<TasksScreen> {
           backgroundColor: Theme
               .of(context)
               .scaffoldBackgroundColor,
-          title: Text('Tasks'),
+          title: Text('Tasks',style: TextStyle(color: Colors.black),),
           actions: [IconButton(onPressed: () {
             showDialog(context: context, builder: (context) {
               return AlertDialog(title: Text("Task category", style: TextStyle(
