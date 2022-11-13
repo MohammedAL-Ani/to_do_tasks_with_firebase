@@ -1,30 +1,46 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:tasks_with_firebase/task_screen/tasks.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:tasks_with_firebase/Screen/details_task_screen%20/widget/comment_widget.dart';
+import 'package:tasks_with_firebase/share/error_dialog/error_dialog_handling.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../share/constants/constant.dart';
+import '../../task_screen/tasks.dart';
 
 class TaskDetails extends StatefulWidget {
   final String taskId;
   final String uploadedBy;
 
   const TaskDetails({required this.taskId, required this.uploadedBy});
+
+
   @override
   _TaskDetailsState createState() => _TaskDetailsState();
 }
 
 class _TaskDetailsState extends State<TaskDetails> {
+
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
+
+
   bool _isCommenting = false;
   var contentsInfo = TextStyle(
       fontWeight: FontWeight.normal, fontSize: 15, color: Constants.darkBlue);
 
-  // final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   String? _authorName;
   String? _authorPosition;
   String? taskDescription;
   String? taskTitle;
   bool? _isDone;
-  // Timestamp? postedDateTimeStamp;
-  // Timestamp? deadlineDateTimeStamp;
+  Timestamp? postedDateTimeStamp;
+  Timestamp? deadlineDateTimeStamp;
   String? deadlineDate;
   String? postedDate;
   String? userImageUrl;
@@ -37,55 +53,56 @@ class _TaskDetailsState extends State<TaskDetails> {
     _commentController.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    // getData();
-  }
 
-  // void getData() async {
-  //   try {
-  //     _isLoading = true;
-  //     final DocumentSnapshot userDoc = await FirebaseFirestore.instance
-  //         .collection('users')
-  //         .doc(select_photo_options.uploadedBy)
-  //         .get();
-  //     if (userDoc == null) {
-  //       return;
-  //     } else {
-  //       setState(() {
-  //         _authorName = userDoc.get('name');
-  //         _authorPosition = userDoc.get('positionInCompany');
-  //         userImageUrl = userDoc.get('userImageUrl');
-  //       });
-  //     }
-  //     final DocumentSnapshot taskDatabase = await FirebaseFirestore.instance
-  //         .collection('tasks')
-  //         .doc(select_photo_options.taskId)
-  //         .get();
-  //     if (taskDatabase == null) {
-  //       return;
-  //     } else {
-  //       setState(() {
-  //         taskDescription = taskDatabase.get('taskDescription');
-  //         _isDone = taskDatabase.get('isDone');
-  //         deadlineDate = taskDatabase.get('deadlineDate');
-  //         deadlineDateTimeStamp = taskDatabase.get('deadlineDateTimeStamp');
-  //         postedDateTimeStamp = taskDatabase.get('createdAt');
-  //         var postDate = postedDateTimeStamp!.toDate();
-  //         postedDate = '${postDate.year}-${postDate.month}-${postDate.day}';
-  //         var date = deadlineDateTimeStamp!.toDate();
-  //         isDeadlineAvailable = date.isAfter(DateTime.now());
-  //       });
-  //     }
-  //   } catch (error) {
-  //     GlobalMethods.showErrorDialog(
-  //         error: 'An error occured', context: context);
-  //   } finally {
-  //     _isLoading = false;
-  //   }
-  // }
 
+
+
+ void getData() async {
+    _isLoading = true;
+    try{
+      final DocumentSnapshot userData = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.uploadedBy).get();
+
+      if (userData == null) {
+        return;
+      } else {
+        setState(() {
+          _authorName = userData.get('name');
+          _authorPosition = userData.get('positionInCompany');
+          userImageUrl = userData.get('userImageUrl');
+        });
+      }
+
+      final DocumentSnapshot userTasks = await FirebaseFirestore.instance.collection('tasks')
+          .doc(widget.taskId).get();
+
+      if(userTasks == null ){
+        return;
+      }else {
+        setState(() {
+          taskDescription = userTasks.get('taskDescription');
+          taskTitle = userTasks.get('taskTitle');
+          _isDone = userTasks.get('isDone');
+
+          deadlineDate = userTasks.get('deadlineDate');
+          deadlineDateTimeStamp = userTasks.get('deadlineDateTimeStamp');
+          postedDateTimeStamp = userTasks.get('createdAt');
+          var postDate = postedDateTimeStamp!.toDate();
+          postedDate = '${postDate.year}-${postDate.month}-${postDate.day}';
+          var date = deadlineDateTimeStamp!.toDate();
+          isDeadlineAvailable = date.isAfter(DateTime.now());
+        });
+      }
+    }catch (error) {
+      GlobalMethods.showErrorDialog(
+          error: 'An error occured', context: context);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+ }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,21 +110,16 @@ class _TaskDetailsState extends State<TaskDetails> {
         automaticallyImplyLeading: false,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.black54,
-          ),
-          onPressed: () { Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TasksScreen(),
-            ),
-          );},
-        ),
-
-        ),
-
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) =>  TasksScreen()),
+            );
+          },
+          child:
+          Icon ( Icons.arrow_back_ios_new,color:Colors.black),),
+      ),
       body: _isLoading
           ? Center(
         child: Text(
@@ -285,20 +297,20 @@ class _TaskDetailsState extends State<TaskDetails> {
                                         fontSize: 15,
                                         color: Constants.darkBlue)),
                                 onPressed: () {
-                                  // User? user = _auth.currentUser;
-                                  // String _uid = user!.uid;
-                                  // if (_uid == widget.uploadedBy) {
-                                  //   FirebaseFirestore.instance
-                                  //       .collection('tasks')
-                                  //       .doc(widget.taskId)
-                                  //       .update({'isDone': true});
-                                  //   getData();
-                                  // } else {
-                                  //   GlobalMethods.showErrorDialog(
-                                  //       error:
-                                  //       'You can\'t perform this action',
-                                  //       context: context);
-                                  // }
+                                  User? user = _auth.currentUser;
+                                  String _uid = user!.uid;
+                                  if (_uid == widget.uploadedBy) {
+                                    FirebaseFirestore.instance
+                                        .collection('tasks')
+                                        .doc(widget.taskId)
+                                        .update({'isDone': true});
+                                    getData();
+                                  } else {
+                                    GlobalMethods.showErrorDialog(
+                                        error:
+                                        'You can\'t perform this action',
+                                        context: context);
+                                  }
                                 },
                               )),
                           Opacity(
@@ -323,20 +335,20 @@ class _TaskDetailsState extends State<TaskDetails> {
                                       color: Constants.darkBlue,
                                     )),
                                 onPressed: () {
-                                  // User? user = _auth.currentUser;
-                                  // String _uid = user!.uid;
-                                  // if (_uid == widget.uploadedBy) {
-                                  //   FirebaseFirestore.instance
-                                  //       .collection('tasks')
-                                  //       .doc(widget.taskId)
-                                  //       .update({'isDone': false});
-                                  //   getData();
-                                  // } else {
-                                  //   GlobalMethods.showErrorDialog(
-                                  //       error:
-                                  //       'You can\'t perform this action',
-                                  //       context: context);
-                                  // },
+                                  User? user = _auth.currentUser;
+                                  String _uid = user!.uid;
+                                  if (_uid == widget.uploadedBy) {
+                                    FirebaseFirestore.instance
+                                        .collection('tasks')
+                                        .doc(widget.taskId)
+                                        .update({'isDone': false});
+                                    getData();
+                                  } else {
+                                    GlobalMethods.showErrorDialog(
+                                        error:
+                                        'You can\'t perform this action',
+                                        context: context);
+                                  }
                                 },
                               )),
                           Opacity(
@@ -429,56 +441,56 @@ class _TaskDetailsState extends State<TaskDetails> {
                                     children: [
                                       MaterialButton(
                                         onPressed: () async {
-                                          // if (_commentController
-                                          //     .text.length <
-                                          //     7) {
-                                          //   GlobalMethods
-                                          //       .showErrorDialog(
-                                          //       error:
-                                          //       'Comment cant be less than 7 characteres',
-                                          //       context:
-                                          //       context);
-                                          // } else {
-                                          //   final _generatedId =
-                                          //   Uuid().v4();
-                                          //   await FirebaseFirestore
-                                          //       .instance
-                                          //       .collection('tasks')
-                                          //       .doc(widget.taskId)
-                                          //       .update({
-                                          //     'taskComments':
-                                          //     FieldValue
-                                          //         .arrayUnion([
-                                          //       {
-                                          //         'userId': widget
-                                          //             .uploadedBy,
-                                          //         'commentId':
-                                          //         _generatedId,
-                                          //         'name':
-                                          //         _authorName,
-                                          //         'commentBody':
-                                          //         _commentController
-                                          //             .text,
-                                          //         'time': Timestamp
-                                          //             .now(),
-                                          //         'userImageUrl':
-                                          //         userImageUrl,
-                                          //       }
-                                          //     ]),
-                                          //   });
-                                          //   await Fluttertoast.showToast(
-                                          //       msg:
-                                          //       "Task has been uploaded successfuly",
-                                          //       toastLength: Toast
-                                          //           .LENGTH_LONG,
-                                          //       gravity:
-                                          //       ToastGravity
-                                          //           .CENTER,
-                                          //       fontSize: 16.0);
-                                          //   _commentController
-                                          //       .clear();
-                                          //   setState(() {});
-                                          // }
+                                          if (_commentController
+                                              .text.length <
+                                              7) {
+                                            GlobalMethods
+                                                .showErrorDialog(
+                                                error:
+                                                'Comment cant be less than 7 characteres',
+                                                context:
+                                                context);
+                                          } else {
+                                            final _generatedId =
+                                            Uuid().v4();
+                                            await FirebaseFirestore
+                                                .instance
+                                                .collection('tasks')
+                                                .doc(widget.taskId)
+                                                .update({
+                                              'taskComments':
+                                              FieldValue
+                                                  .arrayUnion([
+                                                {
+                                                  'userId': widget
+                                                      .uploadedBy,
+                                                  'commentId':
+                                                  _generatedId,
+                                                  'name':
+                                                  _authorName,
+                                                  'commentBody':
+                                                  _commentController
+                                                      .text,
+                                                  'time': Timestamp
+                                                      .now(),
+                                                  'userImageUrl':
+                                                  userImageUrl,
+                                                }
+                                              ]),
+                                            });
+                                            await Fluttertoast.showToast(
+                                                msg:
+                                                "Task has been uploaded successfuly",
+                                                toastLength: Toast
+                                                    .LENGTH_LONG,
+                                                gravity:
+                                                ToastGravity
+                                                    .CENTER,
+                                                fontSize: 16.0);
+                                            _commentController
+                                                .clear();
+                                            setState(() {});
+                                          }
                                         },
                                         color: Colors.pink.shade700,
                                         elevation: 10,
@@ -548,53 +560,53 @@ class _TaskDetailsState extends State<TaskDetails> {
                       SizedBox(
                         height: 30,
                       ),
-                      // FutureBuilder<DocumentSnapshot>(
-                      //     future: FirebaseFirestore.instance
-                      //         .collection('tasks')
-                      //         .doc(widget.taskId)
-                      //         .get(),
-                      //     builder: (context, snapshot) {
-                      //       if (snapshot.connectionState ==
-                      //           ConnectionState.waiting) {
-                      //         return Center(
-                      //           child: CircularProgressIndicator(),
-                      //         );
-                      //       } else {
-                      //         if (snapshot.data == null) {
-                      //           return Container();
-                      //         }
-                      //       }
-                      //       return ListView.separated(
-                      //           reverse: true,
-                      //           shrinkWrap: true,
-                      //           physics: NeverScrollableScrollPhysics(),
-                      //           itemBuilder: (ctx, index) {
-                      //             return CommentWidget(
-                      //               commentId:
-                      //               snapshot.data!['taskComments']
-                      //               [index]['commentId'],
-                      //               commentBody:
-                      //               snapshot.data!['taskComments']
-                      //               [index]['commentBody'],
-                      //               commenterId:
-                      //               snapshot.data!['taskComments']
-                      //               [index]['userId'],
-                      //               commenterName:
-                      //               snapshot.data!['taskComments']
-                      //               [index]['name'],
-                      //               commenterImageUrl:
-                      //               snapshot.data!['taskComments']
-                      //               [index]['userImageUrl'],
-                      //             );
-                      //           },
-                      //           separatorBuilder: (ctx, index) {
-                      //             return Divider(
-                      //               thickness: 1,
-                      //             );
-                      //           },
-                      //           itemCount: snapshot
-                      //               .data!['taskComments'].length);
-                      //     })
+                      FutureBuilder<DocumentSnapshot>(
+                          future: FirebaseFirestore.instance
+                              .collection('tasks')
+                              .doc(widget.taskId)
+                              .get(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else {
+                              if (snapshot.data == null) {
+                                return Container();
+                              }
+                            }
+                            return ListView.separated(
+                                reverse: true,
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemBuilder: (ctx, index) {
+                                  return CommentWidget(
+                                    commentId:
+                                    snapshot.data!['taskComments']
+                                    [index]['commentId'],
+                                    commentBody:
+                                    snapshot.data!['taskComments']
+                                    [index]['commentBody'],
+                                    commenterId:
+                                    snapshot.data!['taskComments']
+                                    [index]['userId'],
+                                    commenterName:
+                                    snapshot.data!['taskComments']
+                                    [index]['name'],
+                                    commenterImageUrl:
+                                    snapshot.data!['taskComments']
+                                    [index]['userImageUrl'],
+                                  );
+                                },
+                                separatorBuilder: (ctx, index) {
+                                  return Divider(
+                                    thickness: 1,
+                                  );
+                                },
+                                itemCount: snapshot
+                                    .data!['taskComments'].length);
+                          })
                     ],
                   ),
                 ),

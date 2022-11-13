@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tasks_with_firebase/Screen/darwer_screen/list_darwer_screen/my_account/widget/social_buttons.dart';
 import 'package:tasks_with_firebase/share/error_dialog/error_dialog_handling.dart';
+import 'package:tasks_with_firebase/task_screen/tasks.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
@@ -50,8 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return;
       } else {
         setState(() {
-
-          email = userData.get('email');
+          email = userData.get('email') ;
           name = userData.get('name');
           phoneNumber = userData.get('phoneNumber');
           job = userData.get('positionInCompany');
@@ -79,11 +79,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      drawer: DrawerWidget(),
+      // drawer: DrawerWidget(),
       appBar: AppBar(
         elevation: 0,
         iconTheme: IconThemeData(color: Colors.black),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+       leading: GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) =>  TasksScreen()),
+      );
+    },
+       child:
+       Icon ( Icons.arrow_back_ios_new,color:Colors.black),),
       ),
       body: _isLoading
           ? Center(

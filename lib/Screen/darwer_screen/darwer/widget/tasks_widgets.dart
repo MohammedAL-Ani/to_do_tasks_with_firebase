@@ -40,7 +40,7 @@ class _TaskWidgetState extends State<TaskWidget> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => TaskDetails(taskId: '', uploadedBy: '',),
+              builder: (context) => TaskDetails(taskId: widget.taskId, uploadedBy: widget.uploadedBy,),
             ),
           );
         },
